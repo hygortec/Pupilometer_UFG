@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 import sys
 
 
+
 def funcao_identifica_pupila(img_input, num_frame, fps):
 
     img = cv2.cvtColor(img_input, cv2.COLOR_BGR2GRAY)
