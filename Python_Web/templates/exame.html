@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.css">   
+    <title>Exame</title>
+</head>
+<body>
+    <div class="container">
+      <div class="page-header">       
+      </div>
+      <form action="/executar_exame" method="post">      
+        <center>
+
+          <fieldset style="width:300px">
+            <legend>Stimulated:</legend>
+            <input type="radio" id="Left" name="estimulo" value="L"><label for="Left">Left</label>
+            <input type="radio" id="Right" name="estimulo" value="R"><label for="Right">Right</label>
+            <input type="radio" id="esquerdo_direito" name="estimulo" value="LR"><label for="esquerdo_direito">Esquerdo|Direito</label>
+          </fieldset>          
+          <fieldset style="width:300px">
+            <legend>Eye record:</legend>
+            <input type="radio" id="esquerdo" name="gravar" value="L"><label for="esquerdo">Esquerdo</label>
+            <input type="radio" id="direito" name="gravar" value="R"><label for="direito">Direito</label>
+            <input type="radio" id="esquerdo_direito" name="gravar" value="LR"><label for="esquerdo_direito">Esquerdo|Direito</label>
+          </fieldset>
+          <br>
+          <br>
+          <br>
+          <br>
+          
+          <a href="/executar_exame"><input type="submit" value="Iniciar"/></a>
+          <a href="/"><input type="button" value="Voltar"/></a>          
+        </center>                    
+      </form>
+    </div>
+</body>
+</html>
