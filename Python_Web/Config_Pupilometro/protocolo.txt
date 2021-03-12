@@ -1,0 +1,5 @@
+protocol:
+Intensity_Red:1
+Intensity_Green:1
+Intensity_Blue:1
+Intensity_White:1

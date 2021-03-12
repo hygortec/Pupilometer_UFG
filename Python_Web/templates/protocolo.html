@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.css">   
+    <title>Protocolo</title>
+</head>
+<body>
+    <div class="container">
+      <div class="page-header">       
+      </div>
+      <form action="/salvar_protocolo" method="post">      
+        <center>
+          <label for="protocol">Protocol: </label>            
+          <input type="text" id="protocol" name="protocol" class="form-control"> 
+          <br><br>
+          <fieldset style="width:270px">
+            <legend>Intensity:</legend>
+            <table style="width:100%">  
+              <tr>
+                <td><label for="Red">Red:</label></td>
+                <td><label for="Red">0 %</label><input type="range" min="1" max="100" value="0" class="slider" name="Intensity_Red" id="Intensity_Red"><label for="Red">100 %</label></td>    
+              </tr>
+              <tr>
+                <td><label for="Green">Green:</label></td>
+                <td><label for="Green">0 %</label><input type="range" min="1" max="100" value="0" class="slider" name="Intensity_Green" id="Intensity_Green"><label for="Green">100 %</label></td>    
+              </tr>
+              <tr>
+                <td><label for="Blue">Blue:</label></td>
+                <td><label for="Blue">0 %</label><input type="range" min="1" max="100" value="0" class="slider" name="Intensity_Blue" id="Intensity_Blue"><label for="Blue">100 %</label></td>    
+              </tr>
+               <tr>
+                <td><label for="White">White:</label></td>
+                <td><label for="White">0 %</label><input type="range" min="1" max="100" value="0" class="slider" name="Intensity_White" id="Intensity_White"><label for="White">100 %</label></td>    
+              </tr>
+              <tr>
+                <td>
+                  <a href="/">
+                    <input type="submit" value="Test"/>
+                  </a>
+                </td> 
+              </tr>
+            </table>
+          </fieldset>
+          <br><br>
+          <button type="submit" class="btn btn-primary btn-salvar">Salvar</button>
+          <a href="/">
+            <input type="submit" value="Voltar"/>
+           </a>          
+        </center>                    
+      </form>
+    </div>
+</body>
+</html>
