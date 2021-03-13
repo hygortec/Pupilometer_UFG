@@ -1,5 +1,5 @@
-protocol:
-Intensity_Red:1
-Intensity_Green:1
-Intensity_Blue:1
-Intensity_White:1
+protocol:Teste
+Intensity_Red:81
+Intensity_Green:67
+Intensity_Blue:83
+Intensity_White:100

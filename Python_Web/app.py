@@ -45,8 +45,8 @@ def salvar_protocolo():
 @app.route('/executar_exame', methods=['GET','POST'])
 def executar_exame():
     if request.method == 'POST':
-        estimulo = request.form['estimulo'] 
-        gravar = request.form['gravar']
+        estimulo = request.form['stimulated'] 
+        gravar = request.form['record']
 
         new_path = os.path.dirname(os.path.abspath(__file__)) + '\\Config_Pupilometro\\exame.txt'      
 
