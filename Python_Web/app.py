@@ -1,7 +1,31 @@
 from flask import Flask, render_template, request, redirect
 import os
+from imutils.video import VideoStream
+from flask import Response
+import threading
+import argparse
+import datetime
+import imutils
+import time
+import cv2
 
 app = Flask(__name__)
+
+# initialize the output frame and a lock used to ensure thread-safe
+# exchanges of the output frames (useful when multiple browsers/tabs
+# are viewing the stream)
+t = threading
+stop = False
+outputFrame_letf = None
+lock = threading.Lock()
+# initialize a flask object
+app = Flask(__name__)
+# initialize the video stream and allow the camera sensor to
+# warmup
+#vs = VideoStream(usePiCamera=1).start()
+cam_left = VideoStream(src=0).start()
+cam_right = VideoStream(src=1).start()
+time.sleep(2.0)
 
 @app.route('/')
 @app.route('/index')
@@ -13,8 +37,17 @@ def protocolo():
     return render_template('protocolo.html')
 
 @app.route('/exame')
-def exame():
+def exame():    
+    stop_preview()
     return render_template('exame.html')
+
+@app.route('/preview')
+def preview():    
+    global t
+    t = threading.Thread(target=start_preview)
+    t.daemon = True
+    t.start()
+    return render_template('preview.html')
 
 @app.route('/salvar_protocolo', methods=['GET','POST'])
 def salvar_protocolo():
@@ -56,8 +89,90 @@ def executar_exame():
         print (protocolo)
     return redirect("/")
 
+def start_preview():
+	# grab global references to the video stream, output frame, and
+	# lock variables
+	global cam_left, cam_right, outputFrame_letf, outputFrame_right, lock, stop
+	# initialize the motion detector and the total number of frames
+	# read thus far
+	stop = False
+    # loop over frames from the video stream
+	while stop== False:
+		# read the next frame from the video stream, resize it,
+		# convert the frame to grayscale, and blur it
+		frame_left = cam_left.read()
+		frame_right = cam_right.read()
 
+		with lock:
+			outputFrame_letf = frame_left.copy()
+			outputFrame_right = frame_right.copy()
+
+
+def stop_preview():
+    # grab global references to the video stream, output frame, and
+    # lock variables
+    global stop, t
+    stop = True
+
+def generate_left():
+	# grab global references to the output frame and lock variables
+	global outputFrame_letf, lock
+	# loop over frames from the output stream
+	while True:
+		# wait until the lock is acquired
+		with lock:
+			# check if the output frame is available, otherwise skip
+			# the iteration of the loop
+			if outputFrame_letf is None:
+				continue
+			# encode the frame in JPEG format
+			(flag, encodedImage) = cv2.imencode(".jpg", outputFrame_letf)
+			# ensure the frame was successfully encoded
+			if not flag:
+				continue
+		# yield the output frame in the byte format
+		yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + 
+			bytearray(encodedImage) + b'\r\n')
+
+def generate_right():
+	# grab global references to the output frame and lock variables
+	global outputFrame_right, lock
+	# loop over frames from the output stream
+	while True:
+		# wait until the lock is acquired
+		with lock:
+			# check if the output frame is available, otherwise skip
+			# the iteration of the loop
+			if outputFrame_right is None:
+				continue
+			# encode the frame in JPEG format
+			(flag, encodedImage) = cv2.imencode(".jpg", outputFrame_right)
+			# ensure the frame was successfully encoded
+			if not flag:
+				continue
+		# yield the output frame in the byte format
+		yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + 
+			bytearray(encodedImage) + b'\r\n')
+
+@app.route("/video_feed_left")
+def video_feed_left():
+	# return the response generated along with the specific media
+	# type (mime type)
+	return Response(generate_left(), mimetype = "multipart/x-mixed-replace; boundary=frame")
+
+@app.route("/video_feed_right")
+def video_feed_right():
+	# return the response generated along with the specific media
+	# type (mime type)
+	return Response(generate_right(), mimetype = "multipart/x-mixed-replace; boundary=frame")
 
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0')
+	# construct the argument parser and parse command line arguments
+	
+	# start a thread that will perform motion detection
+	
+	# start the flask app
+	app.run(host="0.0.0.0", port="5000", debug=True, threaded=True, use_reloader=False)
+# release the video stream pointer
+vs.stop()
