@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect
 import os
+from imutils.video import VideoStream
 from flask import Response
 import threading
 import argparse
@@ -23,8 +24,8 @@ app = Flask(__name__)
 # initialize the video stream and allow the camera sensor to
 # warmup
 #vs = VideoStream(usePiCamera=1).start()
-cam_left = cv2.VideoCapture(0)
-cam_right = cv2.VideoCapture(1)
+cam_left = VideoStream(src=0)
+cam_right = VideoStream(src=1)
 
 time.sleep(2.0)
 
@@ -96,20 +97,18 @@ def start_preview():
 	# lock variables
 	global cam_left, cam_right, outputFrame_letf, outputFrame_right, lock, stop
 
+
 	stop = False
 	# loop over frames from the video stream
 	while stop== False:
 		# read the next frame from the video stream, resize it,
-		# convert the frame to grayscale, and blur it		
-
-		ret_cam1, frame_left = cam_left.read()  
-		ret_cam2, frame_right = cam_right.read() 
+		# convert the frame to grayscale, and blur it
+		frame_left = cam_left.read()
+		frame_right = cam_right.read()
 
 		with lock:
 			outputFrame_letf = frame_left.copy()
 			outputFrame_right = frame_right.copy()
-
-
 
 def stop_preview():
     # grab global references to the video stream, output frame, and

@@ -1,5 +1,5 @@
-protocol:Hfffuf
-Intensity_Red:65
-Intensity_Green:50
-Intensity_Blue:56
-Intensity_White:57
+protocol:
+Intensity_Red:1
+Intensity_Green:1
+Intensity_Blue:1
+Intensity_White:1
