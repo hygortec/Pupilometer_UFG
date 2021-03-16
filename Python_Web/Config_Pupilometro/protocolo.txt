@@ -1,5 +1,5 @@
-protocol:
-Intensity_Red:1
-Intensity_Green:1
-Intensity_Blue:1
-Intensity_White:1
+protocol=150;30R;1770;30B;1770;30G;1770;30W;1770
+Intensity_Red=35
+Intensity_Green=1
+Intensity_Blue=40
+Intensity_White=56

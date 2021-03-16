@@ -7,6 +7,7 @@ import datetime
 import imutils
 import time
 import cv2
+from Glasses_UFG_1 import Glasses_UFG 
 
 app = Flask(__name__)
 
@@ -23,24 +24,104 @@ app = Flask(__name__)
 # initialize the video stream and allow the camera sensor to
 # warmup
 #vs = VideoStream(usePiCamera=1).start()
-cam_left = cv2.VideoCapture(0)
-cam_right = cv2.VideoCapture(1)
+
+path_configuracao = ""
+path_exame = ""
+path_protocolo = ""
+
+if os.name=='nt':         
+ path_configuracao = os.path.dirname(os.path.abspath(__file__)) + '\\Config_Pupilometro\\configuracao.txt'
+ path_exame = os.path.dirname(os.path.abspath(__file__)) + '\\Config_Pupilometro\\exame.txt'
+ path_protocolo = os.path.dirname(os.path.abspath(__file__)) + '\\Config_Pupilometro\\protocolo.txt' 
+else:
+ path_configuracao = os.path.dirname(os.path.abspath(__file__)) + '/Config_Pupilometro/configuracao.txt'
+ path_exame = os.path.dirname(os.path.abspath(__file__)) + '/Config_Pupilometro/exame.txt'
+ path_protocolo = os.path.dirname(os.path.abspath(__file__)) + '/Config_Pupilometro/protocolo.txt'
+
+
+cam_left = None
+cam_right = None
 
 time.sleep(2.0)
 
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html')
+	return render_template('index.html')
 
 @app.route('/protocolo')
 def protocolo():
-    return render_template('protocolo.html')
+	protocol = ""
+	Intensity_Red ="0"
+	Intensity_Green = "0"
+	Intensity_Blue = "0"
+	Intensity_White = "0"
+	arquivo = open(path_protocolo, 'r')
+	for linha in arquivo:
+		if "protocol" in linha:
+			protocol = linha.split('=')[1].replace("\n", "")
+		elif "Intensity_Red" in linha:
+			Intensity_Red = linha.split('=')[1].replace("\n", "")
+		elif "Intensity_Green" in linha:
+			Intensity_Green = linha.split('=')[1].replace("\n", "")
+		elif "Intensity_Blue" in linha:
+			Intensity_Blue = linha.split('=')[1].replace("\n", "")
+		elif "Intensity_White":
+			Intensity_White = linha.split('=')[1].replace("\n", "")
+
+	dados=[protocol, Intensity_Red, Intensity_Green, Intensity_Blue, Intensity_White]
+	
+	return render_template('protocolo.html', data=dados)
+
+@app.route('/test_protocolo')
+def test_protocolo():
+	protocol = ""
+	PORTA_COM = ""
+	
+	arquivo = open(path_protocolo, 'r')
+	for linha in arquivo:
+		if "protocol" in linha:
+			protocol = linha.split('=')[1].replace("\n", "")
+		
+	arquivo = open(path_configuracao, 'r')
+	for linha in arquivo:
+		if "PORTA_COM" in linha:
+			PORTA_COM = linha.split('=')[1].replace("\n", "")
+	
+	oculos = Glasses_UFG()
+	oculos.connect(PORTA_COM, 9600)
+
+	oculos.ExecuteProtocol(2, True, True, "3;0.033R;10;0.033G;10;0.033B;10;0.033W;10")
+
+	#return render_template('protocolo.html')
 
 @app.route('/exame')
 def exame():    
-    stop_preview()
-    return render_template('exame.html')
+ stop_preview()
+ return render_template('exame.html')
+
+@app.route('/settings')
+def settings():
+	ARCHIVE_VIDEO_PATH = ""
+	PORTA_COM ="0"
+	LEFT_CAM = "0"
+	RIGHT_CAM = "0"
+	
+	arquivo = open(path_configuracao, 'r')
+	for linha in arquivo:
+		if "ARCHIVE_VIDEO_PATH" in linha:
+			ARCHIVE_VIDEO_PATH = linha.split('=')[1].replace("\n", "")
+		elif "PORTA_COM" in linha:
+			PORTA_COM = linha.split('=')[1].replace("\n", "")
+		elif "LEFT_CAM" in linha:
+			LEFT_CAM = linha.split('=')[1].replace("\n", "")
+		elif "RIGHT_CAM" in linha:
+			RIGHT_CAM = linha.split('=')[1].replace("\n", "")		
+
+	dados=[ARCHIVE_VIDEO_PATH, PORTA_COM, LEFT_CAM, RIGHT_CAM]
+	
+	return render_template('settings.html', data=dados)    
+
 
 @app.route('/preview')
 def preview():    
@@ -53,48 +134,65 @@ def preview():
 
 @app.route('/salvar_protocolo', methods=['GET','POST'])
 def salvar_protocolo():
-    if request.method == 'POST':
-        protocol = request.form['protocol'] 
-        Intensity_Red = request.form['Intensity_Red']
-        Intensity_Green = request.form['Intensity_Green']
-        Intensity_Blue = request.form['Intensity_Blue']
-        Intensity_White = request.form['Intensity_White']
+ if request.method == 'POST':
+  print (path_protocolo)
+  arquivo = open(path_protocolo, 'w')
+  arquivo.write("protocol="+ request.form['protocol'] +"\n")
+  arquivo.write("Intensity_Red="+request.form['Intensity_Red']+"\n")
+  arquivo.write("Intensity_Green="+request.form['Intensity_Green']+"\n")
+  arquivo.write("Intensity_Blue="+request.form['Intensity_Blue']+"\n")
+  arquivo.write("Intensity_White="+request.form['Intensity_White']+"\n")
+  arquivo.close()
+  
+ return redirect("/")
 
-        new_path = os.path.dirname(os.path.abspath(__file__)) + '\\Config_Pupilometro\\protocolo.txt'      
-
-        print (new_path)
-        arquivo = open(new_path, 'w')
-        arquivo.write("protocol:"+protocol+"\n")
-        arquivo.write("Intensity_Red:"+Intensity_Red+"\n")
-        arquivo.write("Intensity_Green:"+Intensity_Green+"\n")
-        arquivo.write("Intensity_Blue:"+Intensity_Blue+"\n")
-        arquivo.write("Intensity_White:"+Intensity_White+"\n")
-        arquivo.close()
-        print (protocol+"\n")
-        print (Intensity_Red+"\n")
-        print (Intensity_Green+"\n")
-        print (Intensity_Blue+"\n")
-        print (Intensity_White+"\n")
-    return redirect("/")
+@app.route('/salvar_configuracao', methods=['GET','POST'])
+def salvar_configuracao():
+ if request.method == 'POST':
+  
+  arquivo = open(path_configuracao, 'w')
+  arquivo.write("ARCHIVE_VIDEO_PATH="+ request.form['path'] +"\n")
+  arquivo.write("PORTA_COM="+request.form['port']+"\n")
+  arquivo.write("LEFT_CAM="+request.form['left_camera']+"\n")
+  arquivo.write("RIGHT_CAM="+request.form['right_camera']+"\n")
+  
+  arquivo.close()
+  
+ return redirect("/")
 
 @app.route('/executar_exame', methods=['GET','POST'])
 def executar_exame():
-    if request.method == 'POST':
-        estimulo = request.form['stimulated'] 
-        gravar = request.form['record']
-
-        new_path = os.path.dirname(os.path.abspath(__file__)) + '\\Config_Pupilometro\\exame.txt'      
-
-        print (new_path)
-        arquivo = open(new_path, 'w')
-        arquivo.write(estimulo+";"+gravar)
-        print (protocolo)
-    return redirect("/")
+ if request.method == 'POST':
+  estimulo = request.form['stimulated'] 
+  gravar = request.form['record']
+  #path_exame = os.path.dirname(os.path.abspath(__file__)) + '\\Config_Pupilometro\\exame.txt'    
+  print (path_exame)
+  arquivo = open(path_exame, 'w')
+  arquivo.write(estimulo+";"+gravar)
+  print (protocolo)
+ return redirect("/")
 
 def start_preview():
 	# grab global references to the video stream, output frame, and
 	# lock variables
 	global cam_left, cam_right, outputFrame_letf, outputFrame_right, lock, stop
+
+	LEFT_CAM = 0
+	RIGHT_CAM = 1
+	arquivo = open(path_configuracao, 'r')
+	for linha in arquivo:
+		if "ARCHIVE_VIDEO_PATH" in linha:
+			ARCHIVE_VIDEO_PATH = linha.split('=')[1].replace("\n", "")
+		elif "PORTA_COM" in linha:
+			PORTA_COM = linha.split('=')[1].replace("\n", "")
+		elif "LEFT_CAM" in linha:
+			LEFT_CAM = linha.split('=')[1].replace("\n", "")
+		elif "RIGHT_CAM" in linha:
+			RIGHT_CAM = linha.split('=')[1].replace("\n", "")		
+
+	cam_left = cv2.VideoCapture(int(LEFT_CAM))
+	cam_right = cv2.VideoCapture(int(RIGHT_CAM))
+
 
 	stop = False
 	# loop over frames from the video stream
@@ -109,17 +207,20 @@ def start_preview():
 			outputFrame_letf = frame_left.copy()
 			outputFrame_right = frame_right.copy()
 
-
+	cam_left.release
+	cam_right.release
 
 def stop_preview():
-    # grab global references to the video stream, output frame, and
-    # lock variables
-    global stop, t
-    stop = True
+ # grab global references to the video stream, output frame, and
+ # lock variables
+ global stop, t
+ stop = True
+ outputFrame_letf = None
+ outputFrame_right = None
 
 def generate_left():
 	# grab global references to the output frame and lock variables
-	global outputFrame_letf, lock
+	global outputFrame_letf, lock, stop
 	# loop over frames from the output stream
 	while True:
 		# wait until the lock is acquired
@@ -137,9 +238,10 @@ def generate_left():
 		yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + 
 			bytearray(encodedImage) + b'\r\n')
 
+
 def generate_right():
 	# grab global references to the output frame and lock variables
-	global outputFrame_right, lock
+	global outputFrame_right, lock, stop
 	# loop over frames from the output stream
 	while True:
 		# wait until the lock is acquired
@@ -173,6 +275,6 @@ def video_feed_right():
 if __name__ == '__main__':
 	
 	# start the flask app
-	app.run(host="0.0.0.0", port="5000", debug=True, threaded=True, use_reloader=False)
+	app.run(host="0.0.0.0", port="80", debug=True, threaded=True, use_reloader=False)
 # release the video stream pointer
 vs.stop()

@@ -18,17 +18,8 @@ class Pupilometer_UFG:
 
     print (path_configuracao)
     arquivo = open(path_configuracao, 'r')
-    #linhas = arquivo.readlines()
-
-    while arquivo.readline():
-        line = arquivo.readline()
-        param = line.split('|')        
-        if param[0] == 'ARCHIVE_VIDEO_PATH':
-            ARCHIVE_VIDEO_PATH = param[1]
-        elif param[0] == 'PORTA_COM':
-            PORTA_COM = param[1]
-
-    for ln in arquivo.readline():
+    
+    for ln in arquivo:
         param = ln.split('|')        
         if param[0] == 'ARCHIVE_VIDEO_PATH':
             ARCHIVE_VIDEO_PATH = param[1]
