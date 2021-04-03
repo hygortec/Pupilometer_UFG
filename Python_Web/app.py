@@ -8,6 +8,7 @@ import imutils
 import time
 import cv2
 from Glasses_UFG_1 import Glasses_UFG 
+from Pupilometer_UFG import Pupilometer_UFG
 
 app = Flask(__name__)
 
@@ -160,16 +161,16 @@ def salvar_configuracao():
   
  return redirect("/")
 
-@app.route('/executar_exame', methods=['GET','POST'])
+
+@app.route('/executar_exame', methods=['GET', 'POST'])
 def executar_exame():
  if request.method == 'POST':
-  estimulo = request.form['stimulated'] 
-  gravar = request.form['record']
-  #path_exame = os.path.dirname(os.path.abspath(__file__)) + '\\Config_Pupilometro\\exame.txt'    
-  print (path_exame)
-  arquivo = open(path_exame, 'w')
-  arquivo.write(estimulo+";"+gravar)
-  print (protocolo)
+	 estimulo = request.form['stimulated']
+	 gravar = request.form['record']
+	
+	 pupilometro = Pupilometer_UFG()
+	 pupilometro.start_exam(int(gravar), int(estimulo))
+
  return redirect("/")
 
 def start_preview():
@@ -210,6 +211,16 @@ def start_preview():
 	cam_left.release
 	cam_right.release
 
+def start_preview_v2():
+	# grab global references to the video stream, output frame, and
+	# lock variables
+	global cam_left, cam_right, outputFrame_letf, outputFrame_right, lock, stop
+	
+	pupilometro = Pupilometer_UFG()
+	pupilometro.start_exam(0)
+
+
+
 def stop_preview():
  # grab global references to the video stream, output frame, and
  # lock variables
@@ -237,7 +248,6 @@ def generate_left():
 		# yield the output frame in the byte format
 		yield(b'--frame\r\n' b'Content-Type: image/jpeg\r\n\r\n' + 
 			bytearray(encodedImage) + b'\r\n')
-
 
 def generate_right():
 	# grab global references to the output frame and lock variables
@@ -277,4 +287,3 @@ if __name__ == '__main__':
 	# start the flask app
 	app.run(host="0.0.0.0", port="80", debug=True, threaded=True, use_reloader=False)
 # release the video stream pointer
-vs.stop()

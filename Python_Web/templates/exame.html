@@ -6,33 +6,49 @@
     <link rel="stylesheet" href="../static/bootstrap/css/bootstrap.css">   
     <title>Exame</title>
 </head>
-<body>
-    <div class="container">
-      <div class="page-header">       
-      </div>
-      <form action="/executar_exame" method="post">      
+<body>        
+      <form action="/executar_exame" method="post">     
+        <div id="loading">
+          <center>
+            <img src="loading5.gif" alt="this slowpoke moves"  width=250/> 
+            <br> 
+            <b>Running exam</b>
+          </center>  
+        </div>
+    <div id="container">   
         <center>
           <fieldset style="width:300px">
             <legend>Stimulated:</legend>
-            <input type="radio" id="Left" name="stimulated" value="L"><label for="Left">Left</label>
-            <input type="radio" id="Right" name="stimulated" value="R"><label for="Right">Right</label>
-            <input type="radio" id="Left_Right" name="stimulated" value="LR"><label for="Left_Right">Left|Right</label>
+            <input type="radio" id="Left" name="stimulated" value="0"><label for="Left">Left</label>
+            <input type="radio" id="Right" name="stimulated" value="1"><label for="Right">Right</label>
+            <input type="radio" id="Left_Right" name="stimulated" value="2"><label for="Left_Right">Left|Right</label>
           </fieldset>          
           <fieldset style="width:300px">
             <legend>Eye record:</legend>
-            <input type="radio" id="Left" name="record" value="L"><label for="Left">Left</label>
-            <input type="radio" id="Right" name="record" value="R"><label for="Right">Right</label>
-            <input type="radio" id="Left_Right" name="record" value="LR"><label for="Left_Right">Left|Right</label>
+            <input type="radio" id="Left" name="record" value="0"><label for="Left">Left</label>
+            <input type="radio" id="Right" name="record" value="1"><label for="Right">Right</label>
+            <input type="radio" id="Left_Right" name="record" value="1"><label for="Left_Right">Left|Right</label>
           </fieldset>
           <br>
           <br>
           <br>
           <br>     
           <a href="/preview"><input type="button" value="Preview"/></a>      
-          <a href="/executar_exame"><input type="submit" value="Start"/></a>
-          <a href="/"><input type="button" value="Return"/></a>
-        </center>                    
-      </form>
-    </div>
+          <a href="/executar_exame"><input type="submit" value="Start" onclick="loading();" /></a>          
+          <a href="/"><input type="button" value="Return"/></a>          
+        </center> 
+      </div>                   
+      </form>    
+    <script type="text/javascript">
+      window.onload = initPage;
+      function initPage(){
+        document.getElementById("loading").style.display = "none";
+      }
+      function loading(){  
+            document.body.style.backgroundColor = "#EBEBEB";      
+            document.getElementById("loading").style.display = "block";
+            document.getElementById("container").style.display = "none";                
+      }
+    </script>
 </body>
 </html>
