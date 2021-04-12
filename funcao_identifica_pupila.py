@@ -6,7 +6,7 @@ from matplotlib import pyplot as plt
 import sys
 
 
-def funcao_identifica_pupila(img_input):
+def funcao_identifica_pupila(num_frame, img_input):
 
     img = cv2.cvtColor(img_input, cv2.COLOR_BGR2GRAY)
 
@@ -40,19 +40,22 @@ def funcao_identifica_pupila(img_input):
 
     # Verifica se encontrou alguma
     if area_array.size == 0:
-        return new_img
+        return new_img, 0
 
     # Pegar a maior area e tira o raio e o centro 
     max_area_index = np.argmax(area_array)
     cnt = cnts[max_area_index]
     (x, y), radius = cv2.minEnclosingCircle(cnt)
 
-    if radius < 20:
-        return new_img
+    #if radius < 20:
+    #    return new_img
 
     # Desenha o contorno e na imagem
     cv2.drawContours(new_img, [cnt], -1, (0, 0, 255), 2)
-    cv2.putText(new_img, ("Center(x:%.0f | y:%.0f) Raio:%.3f" % (
-        x, y, radius)), (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
+    cv2.putText(new_img, ("Frame: %.0d Center(x:%.0f | y:%.0f) Raio:%.3f" % (
+        num_frame, x, y, radius)), (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 1)
 
-    return new_img
+    if radius == None:
+        radius = 0
+
+    return new_img, radius
