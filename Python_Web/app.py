@@ -27,18 +27,14 @@ app = Flask(__name__)
 #vs = VideoStream(usePiCamera=1).start()
 
 path_configuracao = ""
-path_exame = ""
 path_protocolo = ""
 
 if os.name=='nt':         
- path_configuracao = os.path.dirname(os.path.abspath(__file__)) + '\\Config_Pupilometro\\configuracao.txt'
- path_exame = os.path.dirname(os.path.abspath(__file__)) + '\\Config_Pupilometro\\exame.txt'
+ path_configuracao = os.path.dirname(os.path.abspath(__file__)) + '\\Config_Pupilometro\\configuracao.txt' 
  path_protocolo = os.path.dirname(os.path.abspath(__file__)) + '\\Config_Pupilometro\\protocolo.txt' 
 else:
- path_configuracao = os.path.dirname(os.path.abspath(__file__)) + '/Config_Pupilometro/configuracao.txt'
- path_exame = os.path.dirname(os.path.abspath(__file__)) + '/Config_Pupilometro/exame.txt'
+ path_configuracao = os.path.dirname(os.path.abspath(__file__)) + '/Config_Pupilometro/configuracao.txt' 
  path_protocolo = os.path.dirname(os.path.abspath(__file__)) + '/Config_Pupilometro/protocolo.txt'
-
 
 cam_left = None
 cam_right = None
@@ -123,7 +119,6 @@ def settings():
 	
 	return render_template('settings.html', data=dados)    
 
-
 @app.route('/preview')
 def preview():    
 	global t, stop
@@ -165,6 +160,7 @@ def salvar_configuracao():
 @app.route('/executar_exame', methods=['GET', 'POST'])
 def executar_exame():
  if request.method == 'POST':
+	 medical_record = request.form['medical_record']
 	 estimulo = request.form['stimulated']
 	 gravar = request.form['record']
 	

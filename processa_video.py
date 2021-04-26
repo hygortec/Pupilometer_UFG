@@ -1,5 +1,5 @@
 import funcao_identifica_pupila as ft
-import trata_sinal as tr
+import funcao_trata_sinal as tr
 import numpy as np
 import cv2
 import time
