@@ -11,6 +11,7 @@ def tratar(vetor):
     vetor = retira_outlier(vetor)
     vetor = interpolar(vetor)
     return vetor
+    higor
 
 def tratar_new(x, y):
 
